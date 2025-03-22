@@ -18,7 +18,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 320px; /* Increased width for better alignment */
+            width: 100%;
+            max-width: 400px; /* Max width to prevent stretching */
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         #display {
             width: 100%;
@@ -45,16 +50,17 @@
             box-sizing: border-box;
         }
         .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 columns to better fit button labels */
-            grid-gap: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between; /* Make buttons wrap and fit better */
             width: 100%;
         }
         .button {
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 12px;
+            padding: 12px 20px;
             font-size: 16px;
             background-color: #3e8e41;
             color: white;
@@ -64,6 +70,7 @@
             text-align: center;
             white-space: nowrap; /* Prevent label truncation */
             box-sizing: border-box;
+            flex-grow: 1; /* Allow buttons to take equal width */
         }
         .button.active {
             cursor: pointer;
