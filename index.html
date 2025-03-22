@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Template Driven Button Palette</title>
+    <title>Template-Driven Button Palette</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -43,20 +43,20 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #3e8e41;
+            background-color: #ccc;
             color: white;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
-        }
-        .button:hover {
-            background-color: #45a049;
-        }
-        .button.disabled {
-            background-color: #ccc;
             cursor: not-allowed;
         }
-        #mode-selector {
+        .button.active {
+            background-color: #3e8e41;
+            cursor: pointer;
+        }
+        .button:hover.active {
+            background-color: #45a049;
+        }
+        #load-calculator {
             margin-bottom: 20px;
             padding: 10px;
             font-size: 18px;
@@ -71,77 +71,15 @@
 <body>
 
     <div class="container">
-        <div>
-            <button id="mode-selector">Switch to Calculator Mode</button>
-        </div>
+        <button id="load-calculator">Load Calculator</button>
         <div id="display">0</div>
         <div class="buttons">
-            <!-- Buttons will be dynamically inserted here -->
+            <!-- Blank Buttons to be filled with the template -->
         </div>
     </div>
 
     <script>
-        // Button class to handle dynamic label, action, and enable/disable
-        class Button {
-            constructor(label, action, options = {}) {
-                this.label = label;
-                this.action = action;
-                this.style = options.style || {};
-                this.data = options.data || {};
-                this.id = options.id || null;
-                this.enabled = options.enabled !== undefined ? options.enabled : true;
-            }
-
-            // Create the button element
-            createButton() {
-                const btn = document.createElement('button');
-                btn.textContent = this.label;
-                btn.classList.add('button');
-
-                // Apply custom styles
-                for (const [key, value] of Object.entries(this.style)) {
-                    btn.style[key] = value;
-                }
-
-                // Add custom data attributes
-                for (const [key, value] of Object.entries(this.data)) {
-                    btn.setAttribute(`data-${key}`, value);
-                }
-
-                // Set ID if available
-                if (this.id) {
-                    btn.id = this.id;
-                }
-
-                // Add the action to the button
-                if (this.enabled) {
-                    btn.addEventListener('click', this.action);
-                    btn.classList.remove('disabled');
-                } else {
-                    btn.classList.add('disabled');
-                    btn.removeEventListener('click', this.action);
-                }
-
-                return btn;
-            }
-
-            // Update the button label dynamically
-            updateLabel(newLabel) {
-                this.label = newLabel;
-            }
-
-            // Update the button action dynamically
-            updateAction(newAction) {
-                this.action = newAction;
-            }
-
-            // Enable/Disable the button
-            setEnabled(isEnabled) {
-                this.enabled = isEnabled;
-            }
-        }
-
-        // Function to update the display
+        // A function to update the display
         const display = document.getElementById('display');
         function updateDisplay(value) {
             display.textContent = value;
@@ -167,78 +105,98 @@
             }
         }
 
-        // Define a "calculator" template
+        // A class to represent a Button
+        class Button {
+            constructor(label, action, enabled = false) {
+                this.label = label;
+                this.action = action;
+                this.enabled = enabled;
+            }
+
+            // Create the button
+            createButton() {
+                const btn = document.createElement('button');
+                btn.textContent = this.label;
+                btn.classList.add('button');
+                
+                // Apply the action if the button is enabled
+                if (this.enabled) {
+                    btn.classList.add('active');
+                    btn.addEventListener('click', this.action);
+                }
+
+                return btn;
+            }
+
+            // Method to enable or disable the button
+            setEnabled(enabled) {
+                this.enabled = enabled;
+            }
+        }
+
+        // Calculator template
         const calculatorButtons = [
-            new Button('7', () => appendToDisplay('7')),
-            new Button('8', () => appendToDisplay('8')),
-            new Button('9', () => appendToDisplay('9')),
-            new Button('/', () => appendToDisplay('/')),
-            new Button('4', () => appendToDisplay('4')),
-            new Button('5', () => appendToDisplay('5')),
-            new Button('6', () => appendToDisplay('6')),
-            new Button('*', () => appendToDisplay('*')),
-            new Button('1', () => appendToDisplay('1')),
-            new Button('2', () => appendToDisplay('2')),
-            new Button('3', () => appendToDisplay('3')),
-            new Button('-', () => appendToDisplay('-')),
-            new Button('0', () => appendToDisplay('0')),
-            new Button('.', () => appendToDisplay('.')),
-            new Button('=', () => calculateResult()),
-            new Button('+', () => appendToDisplay('+')),
-            new Button('Clear', () => clearDisplay())
+            new Button('7', () => appendToDisplay('7'), true),
+            new Button('8', () => appendToDisplay('8'), true),
+            new Button('9', () => appendToDisplay('9'), true),
+            new Button('/', () => appendToDisplay('/'), true),
+            new Button('4', () => appendToDisplay('4'), true),
+            new Button('5', () => appendToDisplay('5'), true),
+            new Button('6', () => appendToDisplay('6'), true),
+            new Button('*', () => appendToDisplay('*'), true),
+            new Button('1', () => appendToDisplay('1'), true),
+            new Button('2', () => appendToDisplay('2'), true),
+            new Button('3', () => appendToDisplay('3'), true),
+            new Button('-', () => appendToDisplay('-'), true),
+            new Button('0', () => appendToDisplay('0'), true),
+            new Button('.', () => appendToDisplay('.'), true),
+            new Button('=', () => calculateResult(), true),
+            new Button('+', () => appendToDisplay('+'), true),
+            new Button('Clear', () => clearDisplay(), true),
         ];
 
-        // Define a "form" template (for example, a form with only number keys)
-        const formButtons = [
-            new Button('1', () => appendToDisplay('1')),
-            new Button('2', () => appendToDisplay('2')),
-            new Button('3', () => appendToDisplay('3')),
-            new Button('4', () => appendToDisplay('4')),
-            new Button('5', () => appendToDisplay('5')),
-            new Button('6', () => appendToDisplay('6')),
-            new Button('7', () => appendToDisplay('7')),
-            new Button('8', () => appendToDisplay('8')),
-            new Button('9', () => appendToDisplay('9')),
-            new Button('0', () => appendToDisplay('0')),
-            new Button('.', () => appendToDisplay('.')),
-            new Button('Clear', () => clearDisplay())
+        // Blank buttons (initial state)
+        const blankButtons = [
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false)
         ];
 
-        // Set the current template, default is calculator
-        let currentTemplate = calculatorButtons;
-
-        // Function to render buttons based on the current template
-        function renderButtons() {
+        // Render the buttons dynamically based on the template (initially blank)
+        function renderButtons(buttons) {
             const buttonsContainer = document.querySelector('.buttons');
-            buttonsContainer.innerHTML = ''; // Clear current buttons
+            buttonsContainer.innerHTML = ''; // Clear any existing buttons
 
-            currentTemplate.forEach(button => {
+            buttons.forEach(button => {
                 const btnElement = button.createButton();
                 buttonsContainer.appendChild(btnElement);
             });
         }
 
-        // Switch between templates (e.g., Calculator Mode and Form Mode)
-        function switchTemplate(template) {
-            currentTemplate = template;
-            renderButtons();
-        }
-
-        // Event listener for mode switching
-        const modeSelector = document.getElementById('mode-selector');
-        modeSelector.addEventListener('click', () => {
-            if (currentTemplate === calculatorButtons) {
-                switchTemplate(formButtons);
-                modeSelector.textContent = 'Switch to Calculator Mode';
-            } else {
-                switchTemplate(calculatorButtons);
-                modeSelector.textContent = 'Switch to Form Mode';
-            }
+        // Event listener for loading the calculator template
+        const loadCalculatorButton = document.getElementById('load-calculator');
+        loadCalculatorButton.addEventListener('click', () => {
+            renderButtons(calculatorButtons);
+            loadCalculatorButton.disabled = true;  // Disable the button after loading
+            loadCalculatorButton.textContent = "Calculator Loaded";  // Change button text
         });
 
-        // Initial render
-        renderButtons();
-
+        // Initial render with blank buttons
+        renderButtons(blankButtons);
     </script>
 
 </body>
