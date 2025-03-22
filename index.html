@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flexible Button Palette with Methods</title>
+    <title>Flexible Button Palette with Dynamic Methods</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -63,56 +63,45 @@
     </div>
 
     <script>
-        // Define a flexible Button class
+        // Create a Button class that allows custom methods, styles, and data
         class Button {
             constructor(label, action, options = {}) {
-                this.label = label;            // Button label (text)
-                this.action = action;          // Function to execute when clicked
-                this.options = options;        // Additional customizable options
-                this.style = options.style || {};  // Custom styling (optional)
-                this.data = options.data || {};    // Custom data attributes (optional)
+                this.label = label;              // The label/text on the button
+                this.action = action;            // The function to execute on click
+                this.style = options.style || {}; // Custom styles for the button
+                this.data = options.data || {};   // Custom data attributes
+                this.id = options.id || null;     // Optional ID for the button
             }
 
-            // Method to create the HTML button element
+            // Method to create the button dynamically with flexible options
             createButton() {
                 const btn = document.createElement('button');
                 btn.textContent = this.label;
                 btn.classList.add('button');
+                
+                // Apply custom styles
                 for (const [key, value] of Object.entries(this.style)) {
                     btn.style[key] = value;
                 }
-                // Attach custom data attributes
+                
+                // Add custom data attributes
                 for (const [key, value] of Object.entries(this.data)) {
                     btn.setAttribute(`data-${key}`, value);
                 }
+                
+                // Set button ID if available
+                if (this.id) {
+                    btn.id = this.id;
+                }
+
+                // Attach the action to the button
                 btn.addEventListener('click', this.action);
                 return btn;
             }
         }
 
-        // Create a calculator button set using Button class
-        const buttonLayout = [
-            new Button('7', () => appendToDisplay('7')),
-            new Button('8', () => appendToDisplay('8')),
-            new Button('9', () => appendToDisplay('9')),
-            new Button('/', () => appendToDisplay('/')),
-            new Button('4', () => appendToDisplay('4')),
-            new Button('5', () => appendToDisplay('5')),
-            new Button('6', () => appendToDisplay('6')),
-            new Button('*', () => appendToDisplay('*')),
-            new Button('1', () => appendToDisplay('1')),
-            new Button('2', () => appendToDisplay('2')),
-            new Button('3', () => appendToDisplay('3')),
-            new Button('-', () => appendToDisplay('-')),
-            new Button('0', () => appendToDisplay('0')),
-            new Button('.', () => appendToDisplay('.')),
-            new Button('=', () => calculateResult()),
-            new Button('+', () => appendToDisplay('+')),
-            new Button('Clear', () => clearDisplay())
-        ];
-
+        // Default display logic
         const display = document.getElementById('display');
-        const buttonsContainer = document.querySelector('.buttons');
 
         // Function to update the display area
         function updateDisplay(value) {
@@ -133,7 +122,7 @@
             updateDisplay('0');
         }
 
-        // Calculate the result
+        // Calculate the result (for calculator purposes)
         function calculateResult() {
             try {
                 updateDisplay(eval(display.textContent));
@@ -142,11 +131,51 @@
             }
         }
 
-        // Dynamically generate buttons and append them to the DOM
-        buttonLayout.forEach(button => {
-            const btnElement = button.createButton();
-            buttonsContainer.appendChild(btnElement);
-        });
+        // Dynamically create buttons for the calculator functionality
+        const buttonLayout = [
+            new Button('7', () => appendToDisplay('7')),
+            new Button('8', () => appendToDisplay('8')),
+            new Button('9', () => appendToDisplay('9')),
+            new Button('/', () => appendToDisplay('/')),
+            new Button('4', () => appendToDisplay('4')),
+            new Button('5', () => appendToDisplay('5')),
+            new Button('6', () => appendToDisplay('6')),
+            new Button('*', () => appendToDisplay('*')),
+            new Button('1', () => appendToDisplay('1')),
+            new Button('2', () => appendToDisplay('2')),
+            new Button('3', () => appendToDisplay('3')),
+            new Button('-', () => appendToDisplay('-')),
+            new Button('0', () => appendToDisplay('0')),
+            new Button('.', () => appendToDisplay('.')),
+            new Button('=', () => calculateResult()),
+            new Button('+', () => appendToDisplay('+')),
+            new Button('Clear', () => clearDisplay())
+        ];
+
+        // Function to render the buttons dynamically
+        function renderButtons() {
+            const buttonsContainer = document.querySelector('.buttons');
+            buttonsContainer.innerHTML = ''; // Clear existing buttons
+            buttonLayout.forEach(button => {
+                const btnElement = button.createButton();
+                buttonsContainer.appendChild(btnElement);
+            });
+        }
+
+        // Render the initial set of buttons (calculator mode)
+        renderButtons();
+
+        // Example: Dynamically change button functionality or appearance
+        // You can change button's action, style, or data at runtime
+        setTimeout(() => {
+            buttonLayout[0].action = () => updateDisplay("Hello!");
+            buttonLayout[0].style.backgroundColor = "#f44336"; // Change button style
+            buttonLayout[0].data.type = "greeting"; // Add custom data attribute
+
+            // Re-render the buttons to apply changes
+            renderButtons();
+        }, 5000); // Change the first button after 5 seconds
     </script>
+
 </body>
 </html>
