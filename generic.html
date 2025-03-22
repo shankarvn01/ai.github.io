@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexible Button Palette with Methods</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #display {
+            width: 250px;
+            height: 50px;
+            text-align: right;
+            font-size: 24px;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 60px);
+            grid-gap: 10px;
+        }
+        .button {
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #3e8e41;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="display">0</div>
+        <div class="buttons">
+            <!-- Buttons will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Define a flexible Button class
+        class Button {
+            constructor(label, action, options = {}) {
+                this.label = label;            // Button label (text)
+                this.action = action;          // Function to execute when clicked
+                this.options = options;        // Additional customizable options
+                this.style = options.style || {};  // Custom styling (optional)
+                this.data = options.data || {};    // Custom data attributes (optional)
+            }
+
+            // Method to create the HTML button element
+            createButton() {
+                const btn = document.createElement('button');
+                btn.textContent = this.label;
+                btn.classList.add('button');
+                for (const [key, value] of Object.entries(this.style)) {
+                    btn.style[key] = value;
+                }
+                // Attach custom data attributes
+                for (const [key, value] of Object.entries(this.data)) {
+                    btn.setAttribute(`data-${key}`, value);
+                }
+                btn.addEventListener('click', this.action);
+                return btn;
+            }
+        }
+
+        // Create a calculator button set using Button class
+        const buttonLayout = [
+            new Button('7', () => appendToDisplay('7')),
+            new Button('8', () => appendToDisplay('8')),
+            new Button('9', () => appendToDisplay('9')),
+            new Button('/', () => appendToDisplay('/')),
+            new Button('4', () => appendToDisplay('4')),
+            new Button('5', () => appendToDisplay('5')),
+            new Button('6', () => appendToDisplay('6')),
+            new Button('*', () => appendToDisplay('*')),
+            new Button('1', () => appendToDisplay('1')),
+            new Button('2', () => appendToDisplay('2')),
+            new Button('3', () => appendToDisplay('3')),
+            new Button('-', () => appendToDisplay('-')),
+            new Button('0', () => appendToDisplay('0')),
+            new Button('.', () => appendToDisplay('.')),
+            new Button('=', () => calculateResult()),
+            new Button('+', () => appendToDisplay('+')),
+            new Button('Clear', () => clearDisplay())
+        ];
+
+        const display = document.getElementById('display');
+        const buttonsContainer = document.querySelector('.buttons');
+
+        // Function to update the display area
+        function updateDisplay(value) {
+            display.textContent = value;
+        }
+
+        // Append text to the display
+        function appendToDisplay(value) {
+            if (display.textContent === '0' || display.textContent === 'Error') {
+                updateDisplay(value);
+            } else {
+                updateDisplay(display.textContent + value);
+            }
+        }
+
+        // Clear the display
+        function clearDisplay() {
+            updateDisplay('0');
+        }
+
+        // Calculate the result
+        function calculateResult() {
+            try {
+                updateDisplay(eval(display.textContent));
+            } catch (e) {
+                updateDisplay('Error');
+            }
+        }
+
+        // Dynamically generate buttons and append them to the DOM
+        buttonLayout.forEach(button => {
+            const btnElement = button.createButton();
+            buttonsContainer.appendChild(btnElement);
+        });
+    </script>
+</body>
+</html>
