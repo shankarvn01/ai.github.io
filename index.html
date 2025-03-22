@@ -18,7 +18,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 300px;
+            width: 320px; /* Increased width for better alignment */
         }
         #display {
             width: 100%;
@@ -31,47 +31,45 @@
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+        .inputs {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .input-field, .select-field {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
         .buttons {
             display: grid;
-            grid-template-columns: repeat(4, 60px);
+            grid-template-columns: repeat(4, 1fr); /* 4 columns to better fit button labels */
             grid-gap: 10px;
-            margin-top: 20px;
+            width: 100%;
         }
         .button {
-            width: 60px;
-            height: 60px;
-            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #ccc;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #3e8e41;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: not-allowed;
+            text-align: center;
+            white-space: nowrap; /* Prevent label truncation */
+            box-sizing: border-box;
         }
         .button.active {
-            background-color: #3e8e41;
             cursor: pointer;
         }
         .button:hover.active {
             background-color: #45a049;
-        }
-        .input-field {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .select-field {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
         }
         #load-financial-calculator {
             margin-bottom: 20px;
@@ -87,6 +85,8 @@
             margin-top: 20px;
             font-size: 18px;
             font-weight: bold;
+            color: #333;
+            text-align: center;
         }
     </style>
 </head>
@@ -118,7 +118,7 @@
             updateDisplay('0');
         }
 
-        // Calculation logic
+        // Calculation logic for financial calculator (Loan Repayment)
         function calculateLoanRepayment() {
             const principal = parseFloat(document.getElementById('principal').value);
             const rate = parseFloat(document.getElementById('interest-rate').value) / 100 / 12; // Monthly interest rate
