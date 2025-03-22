@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flexible Button Palette with Methods</title>
+    <title>Template-Driven Button Palette</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,6 +34,7 @@
             display: grid;
             grid-template-columns: repeat(4, 60px);
             grid-gap: 10px;
+            margin-top: 20px;
         }
         .button {
             width: 60px;
@@ -42,84 +43,48 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #3e8e41;
+            background-color: #ccc;
             color: white;
             border: none;
             border-radius: 5px;
+            cursor: not-allowed;
+        }
+        .button.active {
+            background-color: #3e8e41;
             cursor: pointer;
         }
-        .button:hover {
+        .button:hover.active {
             background-color: #45a049;
+        }
+        #load-calculator {
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <button id="load-calculator">Load Calculator</button>
         <div id="display">0</div>
         <div class="buttons">
-            <!-- Buttons will be dynamically inserted here -->
+            <!-- Blank Buttons to be filled with the template -->
         </div>
     </div>
 
     <script>
-        // Define a flexible Button class
-        class Button {
-            constructor(label, action, options = {}) {
-                this.label = label;            // Button label (text)
-                this.action = action;          // Function to execute when clicked
-                this.options = options;        // Additional customizable options
-                this.style = options.style || {};  // Custom styling (optional)
-                this.data = options.data || {};    // Custom data attributes (optional)
-            }
-
-            // Method to create the HTML button element
-            createButton() {
-                const btn = document.createElement('button');
-                btn.textContent = this.label;
-                btn.classList.add('button');
-                for (const [key, value] of Object.entries(this.style)) {
-                    btn.style[key] = value;
-                }
-                // Attach custom data attributes
-                for (const [key, value] of Object.entries(this.data)) {
-                    btn.setAttribute(`data-${key}`, value);
-                }
-                btn.addEventListener('click', this.action);
-                return btn;
-            }
-        }
-
-        // Create a calculator button set using Button class
-        const buttonLayout = [
-            new Button('7', () => appendToDisplay('7')),
-            new Button('8', () => appendToDisplay('8')),
-            new Button('9', () => appendToDisplay('9')),
-            new Button('/', () => appendToDisplay('/')),
-            new Button('4', () => appendToDisplay('4')),
-            new Button('5', () => appendToDisplay('5')),
-            new Button('6', () => appendToDisplay('6')),
-            new Button('*', () => appendToDisplay('*')),
-            new Button('1', () => appendToDisplay('1')),
-            new Button('2', () => appendToDisplay('2')),
-            new Button('3', () => appendToDisplay('3')),
-            new Button('-', () => appendToDisplay('-')),
-            new Button('0', () => appendToDisplay('0')),
-            new Button('.', () => appendToDisplay('.')),
-            new Button('=', () => calculateResult()),
-            new Button('+', () => appendToDisplay('+')),
-            new Button('Clear', () => clearDisplay())
-        ];
-
+        // A function to update the display
         const display = document.getElementById('display');
-        const buttonsContainer = document.querySelector('.buttons');
-
-        // Function to update the display area
         function updateDisplay(value) {
             display.textContent = value;
         }
 
-        // Append text to the display
         function appendToDisplay(value) {
             if (display.textContent === '0' || display.textContent === 'Error') {
                 updateDisplay(value);
@@ -128,12 +93,10 @@
             }
         }
 
-        // Clear the display
         function clearDisplay() {
             updateDisplay('0');
         }
 
-        // Calculate the result
         function calculateResult() {
             try {
                 updateDisplay(eval(display.textContent));
@@ -142,11 +105,99 @@
             }
         }
 
-        // Dynamically generate buttons and append them to the DOM
-        buttonLayout.forEach(button => {
-            const btnElement = button.createButton();
-            buttonsContainer.appendChild(btnElement);
+        // A class to represent a Button
+        class Button {
+            constructor(label, action, enabled = false) {
+                this.label = label;
+                this.action = action;
+                this.enabled = enabled;
+            }
+
+            // Create the button
+            createButton() {
+                const btn = document.createElement('button');
+                btn.textContent = this.label;
+                btn.classList.add('button');
+                
+                // Apply the action if the button is enabled
+                if (this.enabled) {
+                    btn.classList.add('active');
+                    btn.addEventListener('click', this.action);
+                }
+
+                return btn;
+            }
+
+            // Method to enable or disable the button
+            setEnabled(enabled) {
+                this.enabled = enabled;
+            }
+        }
+
+        // Calculator template
+        const calculatorButtons = [
+            new Button('7', () => appendToDisplay('7'), true),
+            new Button('8', () => appendToDisplay('8'), true),
+            new Button('9', () => appendToDisplay('9'), true),
+            new Button('/', () => appendToDisplay('/'), true),
+            new Button('4', () => appendToDisplay('4'), true),
+            new Button('5', () => appendToDisplay('5'), true),
+            new Button('6', () => appendToDisplay('6'), true),
+            new Button('*', () => appendToDisplay('*'), true),
+            new Button('1', () => appendToDisplay('1'), true),
+            new Button('2', () => appendToDisplay('2'), true),
+            new Button('3', () => appendToDisplay('3'), true),
+            new Button('-', () => appendToDisplay('-'), true),
+            new Button('0', () => appendToDisplay('0'), true),
+            new Button('.', () => appendToDisplay('.'), true),
+            new Button('=', () => calculateResult(), true),
+            new Button('+', () => appendToDisplay('+'), true),
+            new Button('Clear', () => clearDisplay(), true),
+        ];
+
+        // Blank buttons (initial state)
+        const blankButtons = [
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false),
+            new Button('', () => {}, false)
+        ];
+
+        // Render the buttons dynamically based on the template (initially blank)
+        function renderButtons(buttons) {
+            const buttonsContainer = document.querySelector('.buttons');
+            buttonsContainer.innerHTML = ''; // Clear any existing buttons
+
+            buttons.forEach(button => {
+                const btnElement = button.createButton();
+                buttonsContainer.appendChild(btnElement);
+            });
+        }
+
+        // Event listener for loading the calculator template
+        const loadCalculatorButton = document.getElementById('load-calculator');
+        loadCalculatorButton.addEventListener('click', () => {
+            renderButtons(calculatorButtons);
+            loadCalculatorButton.disabled = true;  // Disable the button after loading
+            loadCalculatorButton.textContent = "Calculator Loaded";  // Change button text
         });
+
+        // Initial render with blank buttons
+        renderButtons(blankButtons);
     </script>
+
 </body>
 </html>
