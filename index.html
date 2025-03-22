@@ -79,14 +79,22 @@
         document.getElementById("expression").innerText = currentExpression;
     }
 
-    // Function to evaluate the expression securely
+    // Function to evaluate the current expression
     function evaluate() {
         try {
-            // Using the eval function to evaluate the expression
-            // Limit the scope of eval to prevent any security issues
+            // Check if the expression contains valid characters (numbers, operators, parentheses)
+            if (/[^0-9+\-*/().]/.test(currentExpression)) {
+                throw new Error("Invalid characters in expression.");
+            }
+
+            // Evaluate the expression using the `eval()` function in a safe context
+            // Using `Function` instead of `eval` for better scope control
             let result = new Function('return ' + currentExpression)();
+            
+            // Show the result in the result div
             document.getElementById("result").innerText = "Result: " + result;
         } catch (error) {
+            // Handle errors (e.g., invalid expressions)
             document.getElementById("result").innerText = "Error: " + error.message;
         }
     }
