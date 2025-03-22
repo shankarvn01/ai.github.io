@@ -3,100 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculator Workflow</title>
+    <title>Flexible Button Palette</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
         }
-        #palette {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            max-width: 200px;
-            margin: 0 auto;
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .button {
-            padding: 15px;
-            font-size: 18px;
-            cursor: pointer;
-            background-color: #f0f0f0;
+        #display {
+            width: 250px;
+            height: 50px;
+            text-align: right;
+            font-size: 24px;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #fff;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-        #expression {
-            font-size: 24px;
-            padding: 10px;
-            margin-top: 20px;
-            border: 1px solid #ccc;
-            width: 100%;
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 60px);
+            grid-gap: 10px;
         }
-        #result {
-            margin-top: 20px;
+        .button {
+            width: 60px;
+            height: 60px;
             font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #3e8e41;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
 
-<h1>Build and Execute Expression</h1>
+    <div class="container">
+        <div id="display">0</div>
+        <div class="buttons">
+            <!-- Buttons will be dynamically inserted here -->
+        </div>
+    </div>
 
-<div id="expression"></div>
+    <script>
+        // Define the calculator layout and actions
+        const buttonLayout = [
+            { label: '7', action: () => appendToDisplay('7') },
+            { label: '8', action: () => appendToDisplay('8') },
+            { label: '9', action: () => appendToDisplay('9') },
+            { label: '/', action: () => appendToDisplay('/') },
+            { label: '4', action: () => appendToDisplay('4') },
+            { label: '5', action: () => appendToDisplay('5') },
+            { label: '6', action: () => appendToDisplay('6') },
+            { label: '*', action: () => appendToDisplay('*') },
+            { label: '1', action: () => appendToDisplay('1') },
+            { label: '2', action: () => appendToDisplay('2') },
+            { label: '3', action: () => appendToDisplay('3') },
+            { label: '-', action: () => appendToDisplay('-') },
+            { label: '0', action: () => appendToDisplay('0') },
+            { label: '.', action: () => appendToDisplay('.') },
+            { label: '=', action: () => calculateResult() },
+            { label: '+', action: () => appendToDisplay('+') },
+            { label: 'Clear', action: () => clearDisplay() }
+        ];
 
-<div id="palette">
-    <button class="button" onclick="appendToExpression('1')">1</button>
-    <button class="button" onclick="appendToExpression('2')">2</button>
-    <button class="button" onclick="appendToExpression('3')">3</button>
-    <button class="button" onclick="appendToExpression('+')">+</button>
+        const display = document.getElementById('display');
+        const buttonsContainer = document.querySelector('.buttons');
 
-    <button class="button" onclick="appendToExpression('4')">4</button>
-    <button class="button" onclick="appendToExpression('5')">5</button>
-    <button class="button" onclick="appendToExpression('6')">6</button>
-    <button class="button" onclick="appendToExpression('-')">-</button>
-
-    <button class="button" onclick="appendToExpression('7')">7</button>
-    <button class="button" onclick="appendToExpression('8')">8</button>
-    <button class="button" onclick="appendToExpression('9')">9</button>
-    <button class="button" onclick="appendToExpression('*')">*</button>
-
-    <button class="button" onclick="appendToExpression('0')">0</button>
-    <button class="button" onclick="appendToExpression('.')">.</button>
-    <button class="button" onclick="appendToExpression('/')">/</button>
-    <button class="button" onclick="evaluate()">=</button>
-</div>
-
-<div id="result"></div>
-
-<script>
-    let currentExpression = "";
-
-    // Function to append the value of the clicked button to the expression
-    function appendToExpression(value) {
-        currentExpression += value;
-        document.getElementById("expression").innerText = currentExpression;
-    }
-
-    // Function to evaluate the current expression
-    function evaluate() {
-        try {
-            // Check if the expression contains valid characters (numbers, operators, parentheses)
-            if (/[^0-9+\-*/().]/.test(currentExpression)) {
-                throw new Error("Invalid characters in expression.");
-            }
-
-            // Evaluate the expression using the `eval()` function in a safe context
-            // Using `Function` instead of `eval` for better scope control
-            let result = new Function('return ' + currentExpression)();
-            
-            // Show the result in the result div
-            document.getElementById("result").innerText = "Result: " + result;
-        } catch (error) {
-            // Handle errors (e.g., invalid expressions)
-            document.getElementById("result").innerText = "Error: " + error.message;
+        // Function to update the display area
+        function updateDisplay(value) {
+            display.textContent = value;
         }
-    }
-</script>
 
+        // Append text to the display
+        function appendToDisplay(value) {
+            if (display.textContent === '0' || display.textContent === 'Error') {
+                updateDisplay(value);
+            } else {
+                updateDisplay(display.textContent + value);
+            }
+        }
+
+        // Clear the display
+        function clearDisplay() {
+            updateDisplay('0');
+        }
+
+        // Calculate the result
+        function calculateResult() {
+            try {
+                updateDisplay(eval(display.textContent));
+            } catch (e) {
+                updateDisplay('Error');
+            }
+        }
+
+        // Dynamically generate buttons
+        buttonLayout.forEach(button => {
+            const btn = document.createElement('button');
+            btn.textContent = button.label;
+            btn.classList.add('button');
+            btn.addEventListener('click', button.action);
+            buttonsContainer.appendChild(btn);
+        });
+    </script>
 </body>
 </html>
