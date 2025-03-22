@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flexible Button Palette</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #display {
+            width: 250px;
+            height: 50px;
+            text-align: right;
+            font-size: 24px;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 60px);
+            grid-gap: 10px;
+        }
+        .button {
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #3e8e41;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="display">0</div>
+        <div class="buttons">
+            <!-- Buttons will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        // Define the calculator layout and actions
+        const buttonLayout = [
+            { label: '7', action: () => appendToDisplay('7') },
+            { label: '8', action: () => appendToDisplay('8') },
+            { label: '9', action: () => appendToDisplay('9') },
+            { label: '/', action: () => appendToDisplay('/') },
+            { label: '4', action: () => appendToDisplay('4') },
+            { label: '5', action: () => appendToDisplay('5') },
+            { label: '6', action: () => appendToDisplay('6') },
+            { label: '*', action: () => appendToDisplay('*') },
+            { label: '1', action: () => appendToDisplay('1') },
+            { label: '2', action: () => appendToDisplay('2') },
+            { label: '3', action: () => appendToDisplay('3') },
+            { label: '-', action: () => appendToDisplay('-') },
+            { label: '0', action: () => appendToDisplay('0') },
+            { label: '.', action: () => appendToDisplay('.') },
+            { label: '=', action: () => calculateResult() },
+            { label: '+', action: () => appendToDisplay('+') },
+            { label: 'Clear', action: () => clearDisplay() }
+        ];
+
+        const display = document.getElementById('display');
+        const buttonsContainer = document.querySelector('.buttons');
+
+        // Function to update the display area
+        function updateDisplay(value) {
+            display.textContent = value;
+        }
+
+        // Append text to the display
+        function appendToDisplay(value) {
+            if (display.textContent === '0' || display.textContent === 'Error') {
+                updateDisplay(value);
+            } else {
+                updateDisplay(display.textContent + value);
+            }
+        }
+
+        // Clear the display
+        function clearDisplay() {
+            updateDisplay('0');
+        }
+
+        // Calculate the result
+        function calculateResult() {
+            try {
+                updateDisplay(eval(display.textContent));
+            } catch (e) {
+                updateDisplay('Error');
+            }
+        }
+
+        // Dynamically generate buttons
+        buttonLayout.forEach(button => {
+            const btn = document.createElement('button');
+            btn.textContent = button.label;
+            btn.classList.add('button');
+            btn.addEventListener('click', button.action);
+            buttonsContainer.appendChild(btn);
+        });
+    </script>
+</body>
+</html>
