@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flexible Button Palette with Dynamic Methods</title>
+    <title>Template Driven Button Palette</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,6 +34,7 @@
             display: grid;
             grid-template-columns: repeat(4, 60px);
             grid-gap: 10px;
+            margin-top: 20px;
         }
         .button {
             width: 60px;
@@ -51,11 +52,28 @@
         .button:hover {
             background-color: #45a049;
         }
+        .button.disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #mode-selector {
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <div>
+            <button id="mode-selector">Switch to Calculator Mode</button>
+        </div>
         <div id="display">0</div>
         <div class="buttons">
             <!-- Buttons will be dynamically inserted here -->
@@ -63,52 +81,72 @@
     </div>
 
     <script>
-        // Create a Button class that allows custom methods, styles, and data
+        // Button class to handle dynamic label, action, and enable/disable
         class Button {
             constructor(label, action, options = {}) {
-                this.label = label;              // The label/text on the button
-                this.action = action;            // The function to execute on click
-                this.style = options.style || {}; // Custom styles for the button
-                this.data = options.data || {};   // Custom data attributes
-                this.id = options.id || null;     // Optional ID for the button
+                this.label = label;
+                this.action = action;
+                this.style = options.style || {};
+                this.data = options.data || {};
+                this.id = options.id || null;
+                this.enabled = options.enabled !== undefined ? options.enabled : true;
             }
 
-            // Method to create the button dynamically with flexible options
+            // Create the button element
             createButton() {
                 const btn = document.createElement('button');
                 btn.textContent = this.label;
                 btn.classList.add('button');
-                
+
                 // Apply custom styles
                 for (const [key, value] of Object.entries(this.style)) {
                     btn.style[key] = value;
                 }
-                
+
                 // Add custom data attributes
                 for (const [key, value] of Object.entries(this.data)) {
                     btn.setAttribute(`data-${key}`, value);
                 }
-                
-                // Set button ID if available
+
+                // Set ID if available
                 if (this.id) {
                     btn.id = this.id;
                 }
 
-                // Attach the action to the button
-                btn.addEventListener('click', this.action);
+                // Add the action to the button
+                if (this.enabled) {
+                    btn.addEventListener('click', this.action);
+                    btn.classList.remove('disabled');
+                } else {
+                    btn.classList.add('disabled');
+                    btn.removeEventListener('click', this.action);
+                }
+
                 return btn;
+            }
+
+            // Update the button label dynamically
+            updateLabel(newLabel) {
+                this.label = newLabel;
+            }
+
+            // Update the button action dynamically
+            updateAction(newAction) {
+                this.action = newAction;
+            }
+
+            // Enable/Disable the button
+            setEnabled(isEnabled) {
+                this.enabled = isEnabled;
             }
         }
 
-        // Default display logic
+        // Function to update the display
         const display = document.getElementById('display');
-
-        // Function to update the display area
         function updateDisplay(value) {
             display.textContent = value;
         }
 
-        // Append text to the display
         function appendToDisplay(value) {
             if (display.textContent === '0' || display.textContent === 'Error') {
                 updateDisplay(value);
@@ -117,12 +155,10 @@
             }
         }
 
-        // Clear the display
         function clearDisplay() {
             updateDisplay('0');
         }
 
-        // Calculate the result (for calculator purposes)
         function calculateResult() {
             try {
                 updateDisplay(eval(display.textContent));
@@ -131,8 +167,8 @@
             }
         }
 
-        // Dynamically create buttons for the calculator functionality
-        const buttonLayout = [
+        // Define a "calculator" template
+        const calculatorButtons = [
             new Button('7', () => appendToDisplay('7')),
             new Button('8', () => appendToDisplay('8')),
             new Button('9', () => appendToDisplay('9')),
@@ -152,29 +188,57 @@
             new Button('Clear', () => clearDisplay())
         ];
 
-        // Function to render the buttons dynamically
+        // Define a "form" template (for example, a form with only number keys)
+        const formButtons = [
+            new Button('1', () => appendToDisplay('1')),
+            new Button('2', () => appendToDisplay('2')),
+            new Button('3', () => appendToDisplay('3')),
+            new Button('4', () => appendToDisplay('4')),
+            new Button('5', () => appendToDisplay('5')),
+            new Button('6', () => appendToDisplay('6')),
+            new Button('7', () => appendToDisplay('7')),
+            new Button('8', () => appendToDisplay('8')),
+            new Button('9', () => appendToDisplay('9')),
+            new Button('0', () => appendToDisplay('0')),
+            new Button('.', () => appendToDisplay('.')),
+            new Button('Clear', () => clearDisplay())
+        ];
+
+        // Set the current template, default is calculator
+        let currentTemplate = calculatorButtons;
+
+        // Function to render buttons based on the current template
         function renderButtons() {
             const buttonsContainer = document.querySelector('.buttons');
-            buttonsContainer.innerHTML = ''; // Clear existing buttons
-            buttonLayout.forEach(button => {
+            buttonsContainer.innerHTML = ''; // Clear current buttons
+
+            currentTemplate.forEach(button => {
                 const btnElement = button.createButton();
                 buttonsContainer.appendChild(btnElement);
             });
         }
 
-        // Render the initial set of buttons (calculator mode)
+        // Switch between templates (e.g., Calculator Mode and Form Mode)
+        function switchTemplate(template) {
+            currentTemplate = template;
+            renderButtons();
+        }
+
+        // Event listener for mode switching
+        const modeSelector = document.getElementById('mode-selector');
+        modeSelector.addEventListener('click', () => {
+            if (currentTemplate === calculatorButtons) {
+                switchTemplate(formButtons);
+                modeSelector.textContent = 'Switch to Calculator Mode';
+            } else {
+                switchTemplate(calculatorButtons);
+                modeSelector.textContent = 'Switch to Form Mode';
+            }
+        });
+
+        // Initial render
         renderButtons();
 
-        // Example: Dynamically change button functionality or appearance
-        // You can change button's action, style, or data at runtime
-        setTimeout(() => {
-            buttonLayout[0].action = () => updateDisplay("Hello!");
-            buttonLayout[0].style.backgroundColor = "#f44336"; // Change button style
-            buttonLayout[0].data.type = "greeting"; // Add custom data attribute
-
-            // Re-render the buttons to apply changes
-            renderButtons();
-        }, 5000); // Change the first button after 5 seconds
     </script>
 
 </body>
