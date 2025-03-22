@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Template-Driven Button Palette</title>
+    <title>Financial Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,9 +18,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 300px;
         }
         #display {
-            width: 250px;
+            width: 100%;
             height: 50px;
             text-align: right;
             font-size: 24px;
@@ -56,7 +57,23 @@
         .button:hover.active {
             background-color: #45a049;
         }
-        #load-calculator {
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .select-field {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #load-financial-calculator {
             margin-bottom: 20px;
             padding: 10px;
             font-size: 18px;
@@ -66,15 +83,26 @@
             border: none;
             border-radius: 5px;
         }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <button id="load-calculator">Load Calculator</button>
+        <button id="load-financial-calculator">Load Financial Calculator</button>
         <div id="display">0</div>
+        <div class="inputs">
+            <!-- Input fields will be dynamically populated here -->
+        </div>
         <div class="buttons">
-            <!-- Blank Buttons to be filled with the template -->
+            <!-- Financial calculator buttons will be inserted here -->
+        </div>
+        <div class="result" id="result">
+            <!-- Result will be displayed here -->
         </div>
     </div>
 
@@ -85,24 +113,28 @@
             display.textContent = value;
         }
 
-        function appendToDisplay(value) {
-            if (display.textContent === '0' || display.textContent === 'Error') {
-                updateDisplay(value);
-            } else {
-                updateDisplay(display.textContent + value);
-            }
-        }
-
+        // Clear display
         function clearDisplay() {
             updateDisplay('0');
         }
 
-        function calculateResult() {
-            try {
-                updateDisplay(eval(display.textContent));
-            } catch (e) {
+        // Calculation logic
+        function calculateLoanRepayment() {
+            const principal = parseFloat(document.getElementById('principal').value);
+            const rate = parseFloat(document.getElementById('interest-rate').value) / 100 / 12; // Monthly interest rate
+            const years = parseFloat(document.getElementById('loan-term').value);
+            const payments = years * 12; // Monthly payments
+
+            if (isNaN(principal) || isNaN(rate) || isNaN(years)) {
                 updateDisplay('Error');
+                return;
             }
+
+            const monthlyPayment = (principal * rate) / (1 - Math.pow(1 + rate, -payments));
+            const totalRepayment = monthlyPayment * payments;
+
+            // Display the results
+            document.getElementById('result').textContent = `Monthly Payment: $${monthlyPayment.toFixed(2)} | Total Repayment: $${totalRepayment.toFixed(2)}`;
         }
 
         // A class to represent a Button
@@ -134,69 +166,73 @@
             }
         }
 
-        // Calculator template
-        const calculatorButtons = [
-            new Button('7', () => appendToDisplay('7'), true),
-            new Button('8', () => appendToDisplay('8'), true),
-            new Button('9', () => appendToDisplay('9'), true),
-            new Button('/', () => appendToDisplay('/'), true),
-            new Button('4', () => appendToDisplay('4'), true),
-            new Button('5', () => appendToDisplay('5'), true),
-            new Button('6', () => appendToDisplay('6'), true),
-            new Button('*', () => appendToDisplay('*'), true),
-            new Button('1', () => appendToDisplay('1'), true),
-            new Button('2', () => appendToDisplay('2'), true),
-            new Button('3', () => appendToDisplay('3'), true),
-            new Button('-', () => appendToDisplay('-'), true),
-            new Button('0', () => appendToDisplay('0'), true),
-            new Button('.', () => appendToDisplay('.'), true),
-            new Button('=', () => calculateResult(), true),
-            new Button('+', () => appendToDisplay('+'), true),
-            new Button('Clear', () => clearDisplay(), true),
+        // Financial calculator template
+        const financialCalculatorButtons = [
+            new Button('Calculate', calculateLoanRepayment, true),
+            new Button('Clear', clearDisplay, true),
         ];
 
-        // Blank buttons (initial state)
-        const blankButtons = [
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false),
-            new Button('', () => {}, false)
-        ];
+        // Create input fields for loan amount, interest rate, and loan term
+        function createInputFields() {
+            const inputsContainer = document.querySelector('.inputs');
+            inputsContainer.innerHTML = ''; // Clear any existing fields
 
-        // Render the buttons dynamically based on the template (initially blank)
-        function renderButtons(buttons) {
+            const principalField = document.createElement('input');
+            principalField.type = 'number';
+            principalField.id = 'principal';
+            principalField.placeholder = 'Loan Amount';
+            principalField.classList.add('input-field');
+            
+            const interestField = document.createElement('input');
+            interestField.type = 'number';
+            interestField.id = 'interest-rate';
+            interestField.placeholder = 'Interest Rate (%)';
+            interestField.classList.add('input-field');
+
+            const loanTermField = document.createElement('input');
+            loanTermField.type = 'number';
+            loanTermField.id = 'loan-term';
+            loanTermField.placeholder = 'Loan Term (years)';
+            loanTermField.classList.add('input-field');
+
+            // Add the input fields to the container
+            inputsContainer.appendChild(principalField);
+            inputsContainer.appendChild(interestField);
+            inputsContainer.appendChild(loanTermField);
+
+            const paymentFrequencySelect = document.createElement('select');
+            paymentFrequencySelect.id = 'payment-frequency';
+            paymentFrequencySelect.classList.add('select-field');
+            paymentFrequencySelect.innerHTML = `
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annually">Annually</option>
+            `;
+            inputsContainer.appendChild(paymentFrequencySelect);
+        }
+
+        // Render the financial calculator template
+        function renderFinancialCalculator() {
+            // Create the input fields
+            createInputFields();
+
+            // Render the buttons (Calculate and Clear)
             const buttonsContainer = document.querySelector('.buttons');
-            buttonsContainer.innerHTML = ''; // Clear any existing buttons
+            buttonsContainer.innerHTML = ''; // Clear existing buttons
 
-            buttons.forEach(button => {
+            financialCalculatorButtons.forEach(button => {
                 const btnElement = button.createButton();
                 buttonsContainer.appendChild(btnElement);
             });
         }
 
-        // Event listener for loading the calculator template
-        const loadCalculatorButton = document.getElementById('load-calculator');
-        loadCalculatorButton.addEventListener('click', () => {
-            renderButtons(calculatorButtons);
-            loadCalculatorButton.disabled = true;  // Disable the button after loading
-            loadCalculatorButton.textContent = "Calculator Loaded";  // Change button text
+        // Event listener for loading the financial calculator template
+        const loadFinancialCalculatorButton = document.getElementById('load-financial-calculator');
+        loadFinancialCalculatorButton.addEventListener('click', () => {
+            renderFinancialCalculator();
+            loadFinancialCalculatorButton.disabled = true;  // Disable the button after loading
+            loadFinancialCalculatorButton.textContent = "Financial Calculator Loaded";  // Change button text
         });
-
-        // Initial render with blank buttons
-        renderButtons(blankButtons);
     </script>
 
 </body>
